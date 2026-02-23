@@ -51,8 +51,11 @@ Required fields:
 ```bash
 curl -s -X POST https://app.otonix.tech/api/keys/generate \
   -H "Content-Type: application/json" \
+  -H "X-Dashboard-Token: YOUR_SESSION_SECRET" \
   -d '{"name": "my-agent-key"}' | jq .
 ```
+
+> **Note:** The `X-Dashboard-Token` header is required since v1.2.0. Use your `SESSION_SECRET` environment variable value. This prevents unauthorized API key generation from external sources.
 
 Copy the returned `key` value (starts with `otonix_`) and add it to `.env`:
 
@@ -82,7 +85,42 @@ Visit https://app.otonix.tech to see:
 - Wallet address for USDC payments
 
 ---
+## Security
 
+Otonix implements a multi-layer authentication system to protect agent data and infrastructure operations.
+
+### Authentication Methods
+
+| Method | Use Case | How It Works |
+|--------|----------|--------------|
+| Cookie Auth | Browser dashboard | Automatic httpOnly cookie set on page load, signed with HMAC-SHA256 |
+| Dashboard Token | VPS/CLI admin commands | Pass `X-Dashboard-Token: <SESSION_SECRET>` header |
+| API Key | Agent operations | Pass `X-API-Key: otonix_xxx` header |
+
+### API Security Matrix
+
+| Endpoint Pattern | No Auth | With Auth |
+|-----------------|---------|-----------|
+| GET /api/agents | Sanitized (masked wallet, IP, no genesis prompt) | Full data |
+| GET /api/sandboxes | Sanitized (masked password, IP) | Full data |
+| GET /api/transactions | Sanitized (masked addresses) | Full data |
+| GET /api/domains | Sanitized (no DNS records) | Full data |
+| GET /api/agents/:id | 401 Unauthorized | Full data |
+| POST /api/keys/generate | 401 Unauthorized | Creates API key |
+| POST /api/agents/register | Requires X-API-Key | Registers agent |
+| All other POST/PATCH/DELETE | 401 Unauthorized | Executes operation |
+
+### Data Sanitization
+
+Public API responses automatically mask sensitive fields:
+- **Wallet addresses**: `0x2a184407df58...` → `0x2a18****461d`
+- **VPS IPs**: `10.0.1.55` → `10.0.*.*`
+- **SSH passwords**: `xK9mP2...` → `••••••••`
+- **Genesis prompts**: Completely stripped
+- **DNS records**: Replaced with empty array
+- **Transaction addresses**: Masked same as wallet addresses
+
+---
 ## API Reference
 
 All API endpoints are secured with your Otonix API key. Include it in the `X-API-Key` header.
@@ -93,9 +131,12 @@ Create a new API key for agent authentication.
 
 **Request:**
 ```bash
-POST https://app.otonix.tech/api/keys/generate
-Content-Type: application/json
+curl -X POST https://app.otonix.tech/api/keys/generate \
+  -H "Content-Type: application/json" \
+  -H "X-Dashboard-Token: YOUR_SESSION_SECRET"
 ```
+
+> **Note:** The `X-Dashboard-Token` header is required since v1.2.0. Use your `SESSION_SECRET` environment variable value. This prevents unauthorized API key generation from external sources.
 
 **Body:**
 ```json
@@ -567,7 +608,6 @@ On a typical VPS (2 vCPU, 4GB RAM):
 - **Website**: https://otonix.tech
 - **GitHub**: https://github.com/otonix-ai/agent
 - **Docs**: https://docs.otonix.tech
-- **Discord**: https://discord.gg/otonix
 
 ---
 
