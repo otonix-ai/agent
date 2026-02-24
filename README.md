@@ -602,6 +602,27 @@ On a typical VPS (2 vCPU, 4GB RAM):
 
 ---
 
+## Contributors
+
+This project is open-source and welcomes contributions from anyone.  
+**Contributors** are individuals who help by:
+
+- writing or fixing code,
+- adding or improving documentation,
+- reporting bugs and issues,
+- proposing ideas or new features,
+- or reviewing someone else’s pull requests.
+
+They play a vital role in improving quality, adding features, and keeping the
+project alive.
+
+For technical guidelines on how to contribute, see
+[CONTRIBUTING.md](CONTRIBUTING.md).  
+If you would like your name listed as a contributor, please add yourself to
+[CONTRIBUTORS.md](CONTRIBUTORS.md) via a pull request.
+
+---
+
 ## Support & Community
 
 - **Dashboard**: https://app.otonix.tech
