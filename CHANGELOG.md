@@ -4,6 +4,33 @@ All notable changes to the Otonix Agent Platform will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] - 2026-02-25
+
+### Added
+- Autonomic engine (`server/autonomic.ts`) — background job running every 60 seconds for automated agent lifecycle management
+- Survival tier automation — dynamically updates agent survival tier based on credit balance:
+  - Full ($50+) → Active ($20+) → Minimal ($5+) → Critical ($1+) → Terminated ($0)
+  - Logs every tier change as an agent action with category "system"
+  - Automatically terminates agents when credits reach $0
+- Self-healing VPS restart — detects missed heartbeats and auto-reboots VPS:
+  - Triggers when heartbeat is missed for 3x the agent's heartbeat interval
+  - Reboots VPS via Cherry Servers API (`POST /servers/:id/actions { type: "reboot" }`)
+  - 5-minute cooldown per agent to prevent reboot loops
+  - Falls back to marking agent "inactive" only when no VPS is linked
+  - Logs all healing attempts as agent actions with category "infra"
+- `GET /api/autonomic/status` endpoint — returns engine state, counters, tier thresholds, and Cherry Servers configuration status
+- SurvivalTierBadge component — color-coded tier badges on agent cards (Full Autonomy / Active / Minimal / Critical / Terminated)
+- Credits display on agent cards — shows real-time credit balance per agent
+- Autonomic Engine status panel on agents page — displays tier updates, healing attempts, healing successes, and last cycle timestamp
+
+### Changed
+- Agent cards stats grid expanded from 3 columns to 4 columns (added Credits)
+- "Heartbeat Monitor" stat card replaced with "Autonomic Engine" status indicator (Active/Off with animated icon)
+- Self-healing logic now properly differentiates three cases:
+  - No VPS linked → agent marked inactive
+  - VPS linked but Cherry Servers not configured → warning logged, agent status unchanged
+  - VPS linked + Cherry Servers configured → VPS reboot initiated
+
 ## [1.2.0] - 2026-02-23
 
 ### Security
