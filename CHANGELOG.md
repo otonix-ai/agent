@@ -4,6 +4,29 @@ All notable changes to the Otonix Agent Platform will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.1] - 2026-02-25
+
+### Added
+- Autonomous domain auto-renewal in the Autonomic Engine
+  - Checks all domains with `autoRenew: true` and `status: "active"` every 60 seconds
+  - Renews domains expiring within 30 days via Vercel Registrar API (`POST /v1/registrar/domains/:domain/renew`)
+  - Linked agent pays renewal cost ($15 default) from credits — skips if insufficient
+  - Updates `expiresAt` +1 year on successful renewal
+  - Deducts credits from linked agent and records USDC transaction
+  - Logs all renewal attempts, successes, failures, and skips as agent actions (category: "domain")
+  - Skips gracefully when no agent linked, insufficient credits, or Vercel API not configured
+- Renewal stats in `GET /api/autonomic/status`: totalRenewalAttempts, totalRenewalSuccesses, vercelDomainsConfigured, renewalWindowDays, renewalCostDefault
+- Vercel Domains configuration status indicator on autonomic engine dashboard panel
+
+### Changed
+- Autonomic engine now runs 3 tasks per cycle: survival tier automation → self-healing VPS → domain auto-renewal
+- Autonomic status panel updated to show renewal stats and Vercel Domains status (Live/Sim)
+
+### Fixed
+- Domain auto-renewal correctly requires a linked agent — domains without agentId are skipped (no orphaned renewals)
+- Renewal attempts counter only increments for eligible domains (agent linked, not expired)
+
+
 ## [1.3.0] - 2026-02-25
 
 ### Added
