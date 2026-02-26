@@ -4,6 +4,28 @@ All notable changes to the Otonix Agent Platform will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.0] - 2026-02-26
+
+### Added
+- **Real‑time Agent Log Viewer** — full monitoring dashboard for autonomous agent actions
+  - **Live Feed**: Auto‑refreshes every 5 seconds with green pulsing LIVE indicator
+  - **Category Filtering**: Filter logs by system, infra, domain, trading, or compute
+  - **Agent Filtering**: Select specific agent when 2+ agents connected
+  - **Pause/Resume Toggle**: Stop live polling without leaving the page
+  - **Expandable Details**: Click any entry to reveal full JSON, action ID, and exact timestamp
+  - **Smart Auto‑Scroll**: New events appear at top automatically; preserves scroll position when reading older entries
+  - **Status Badges**: Visual indicators — completed (green), failed (red), pending (amber)
+  - **Autonomous Badge**: Highlights actions triggered by autonomic engine vs. manual API calls
+  - **Category Icons**: Distinguishing visual markers (system, infra, domain, trading, compute)
+  - **Display Cap**: Shows up to 100 latest events with total event count
+  - **Click‑Safe Panels**: Text selection in details doesn't trigger entry collapse
+  - **Full Test Coverage**: Comprehensive `data-testid` attributes for end‑to‑end testing
+- **Technical Implementation**:
+  - Polls `GET /api/agent-actions` endpoint (auth‑protected) every 5 seconds
+  - Built with TanStack Query (`refetchInterval` for polling control)
+  - `useRef`‑based scroll tracking to preserve manual scroll position
+  - `data-log-details` attribute prevents click‑through collapse on detail text selection
+
 ## [1.3.1] - 2026-02-25
 
 ### Added
